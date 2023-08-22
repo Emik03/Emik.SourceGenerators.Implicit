@@ -2,7 +2,9 @@
 namespace Emik.SourceGenerators.Implicit;
 
 /// <summary>The source generator that implements implicit operators.</summary>
+#pragma warning disable RS1038
 [Generator]
+#pragma warning restore RS1038
 public sealed class OperatorGenerator : ISourceGenerator
 {
     /// <inheritdoc />
@@ -22,7 +24,7 @@ public sealed class OperatorGenerator : ISourceGenerator
            .GetSymbolsWithName(_ => true, cancellationToken: context.CancellationToken)
            .OfType<INamedTypeSymbol>()
            .Where(SymbolPredicates.IsCandidate)
-           .Select(x => (x, Source: x.Source()))
+           .Select(x => (x, Source: x.Source(context.Compilation)))
            .Where(x => x.Source is not null)
            .Select(x => (HintName: x.x.HintName(), x.Source))
            .Lazily(x => context.AddSource(x.HintName, x.Source ?? throw Unreachable))

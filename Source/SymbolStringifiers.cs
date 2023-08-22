@@ -17,10 +17,11 @@ static class SymbolStringifiers
 
     /// <summary>Creates the source of the <see cref="INamedTypeSymbol"/>.</summary>
     /// <param name="symbol">The symbol to use.</param>
+    /// <param name="compilation">The compilation that contains references to ValueTuple.</param>
     /// <returns>The source of the parameter <paramref name="symbol"/>.</returns>
     [Pure]
-    public static string? Source(this INamedTypeSymbol symbol) =>
-        Make(symbol) is { } initial
+    public static string? Source(this INamedTypeSymbol symbol, Compilation compilation) =>
+        Make(symbol, compilation) is { } initial
             ? (symbol as ISymbol)
            .FindPathToNull(x => x.ContainingWithoutGlobal())
            .Aggregate(initial, Next)
@@ -28,8 +29,10 @@ static class SymbolStringifiers
             : null;
 
     [Pure]
-    static string? Make(INamedTypeSymbol type)
+    static string? Make(INamedTypeSymbol type, Compilation compilation)
     {
+        const int MaxTypeParametersInValueTuple = 8;
+
         bool HasOverloadWithSameImplicitSignature(IMethodSymbol method)
         {
             bool ParameterEqual(IMethodSymbol x) =>
@@ -37,6 +40,10 @@ static class SymbolStringifiers
 
             return method.Parameters is [_] && type.InstanceConstructors.Any(ParameterEqual);
         }
+
+        bool LacksRequiredValueTupleReference(IMethodSymbol method) =>
+            Math.Min(method.Parameters.Length, MaxTypeParametersInValueTuple) is not 1 and var length &&
+            compilation.GetTypeByMetadataName($"{nameof(System)}.{nameof(ValueTuple)}`{length}") is null;
 
         return type
            .InstanceConstructors
@@ -46,6 +53,7 @@ static class SymbolStringifiers
            .Omit(SymbolPredicates.HasDisablingAttribute)
            .Omit(x => x.Parameters.Debug() is [var y] ? y.Type.IsInterface() : x.Parameters.Any(x => !x.Type.CanBeGeneric()))
            .Omit(HasOverloadWithSameImplicitSignature)
+           .Omit(LacksRequiredValueTupleReference)
            .Select(x => MakeMethod(type, x))
            .ToCollectionLazily() is { Count: not 0 } collection
             ? CSharp($"{collection}")
@@ -69,7 +77,7 @@ static class SymbolStringifiers
              /// The new instance of {type,0:_} by passing the parameter <paramref name="{parameter}"/> to the constructor
              /// <see cref="{type,0}({types,0})"/>.
              /// </returns>
-             [global::System.Diagnostics.Contracts.PureAttribute]
+             [Pure]
              public static {(types.OfType<IPointerTypeSymbol>().Any() ? "unsafe " : "")}implicit operator {type}(
                 {method.Parameters:_}
              ) =>

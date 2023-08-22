@@ -1,10 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <OutputType>Exe</OutputType>
+        <TargetFrameworks>net452;net8.0</TargetFrameworks>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Remove="UnitGenerator"/>
-        <!--        <Compile Remove="$(Morsels)/Compile/**/*.cs"/>-->
+        <Compile Remove="$(Morsels)/Compile/**/*.cs"/>
         <PackageReference Include="Emik.Unions" Version="2.1.1" PrivateAssets="all"/>
         <PackageReference Include="Emik.Results" Version="2.1.1" PrivateAssets="all"/>
     </ItemGroup>
