@@ -12,12 +12,9 @@ using static SymbolDisplayFormat;
 /// <param name="formattedCount">The number of interpolation expressions in the interpolated string.</param>
 // ReSharper disable ConvertClosureToMethodGroup
 [InterpolatedStringHandler]
-readonly ref struct ParameterizedInterpolatedStringHandler(
-    int literalLength,
-    [UsedImplicitly] int formattedCount
-)
+readonly ref struct ParameterizedInterpolatedStringHandler(int literalLength, int formattedCount)
 {
-    readonly StringBuilder _builder = new(literalLength);
+    readonly StringBuilder _builder = new(literalLength + formattedCount);
 
     /// <summary>Writes the specified string to the handler.</summary>
     /// <param name="value">The string to write.</param>

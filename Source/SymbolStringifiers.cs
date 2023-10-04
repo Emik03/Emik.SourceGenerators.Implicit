@@ -20,16 +20,16 @@ static class SymbolStringifiers
     /// <param name="compilation">The compilation that contains references to ValueTuple.</param>
     /// <returns>The source of the parameter <paramref name="symbol"/>.</returns>
     [Pure]
-    public static string? Source(this INamedTypeSymbol symbol, Compilation compilation) =>
+    public static string? Source(this INamedTypeSymbol? symbol, Compilation compilation) =>
         Make(symbol, compilation) is { } initial
-            ? (symbol as ISymbol)
+            ? ((ISymbol?)symbol)
            .FindPathToNull(x => x.ContainingWithoutGlobal())
            .Aggregate(initial, Next)
            .Then(HeaderAndFooter)
             : null;
 
     [Pure]
-    static string? Make(INamedTypeSymbol type, Compilation compilation)
+    static string? Make(INamedTypeSymbol? type, Compilation compilation)
     {
         const int MaxTypeParametersInValueTuple = 8;
 
@@ -46,7 +46,7 @@ static class SymbolStringifiers
             compilation.GetTypeByMetadataName($"{nameof(System)}.{nameof(ValueTuple)}`{length}") is null;
 
         return type
-           .InstanceConstructors
+          ?.InstanceConstructors
            .Where(type.IsRelativelyAccessible)
            .Omit(type.HasEmptyParametersOrSingleInterfaceOrSingleSelf)
            .Omit(type.HasSameParameters)
