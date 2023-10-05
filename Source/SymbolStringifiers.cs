@@ -4,17 +4,6 @@ namespace Emik.SourceGenerators.Implicit;
 /// <summary>Contains various stringifiers for <see cref="ISymbol"/> and its derivatives.</summary>
 static class SymbolStringifiers
 {
-    /// <summary>Gets the hint name of the <see cref="INamedTypeSymbol"/>.</summary>
-    /// <param name="symbol">The symbol to use.</param>
-    /// <returns>The hint name of the parameter <paramref name="symbol"/>.</returns>
-    [Pure]
-    public static string HintName(this INamedTypeSymbol symbol) =>
-        (symbol as ISymbol).FindSmallPathToNull(IncludedSyntaxNodeRegistrant.ContainingWithoutGlobal)
-       .Select(x => $"{x.Name}{(x is INamedTypeSymbol { TypeParameters.Length: var i and not 0 } ? $"`{i}" : "")}")
-       .Reverse()
-       .Prepend(nameof(Emik))
-       .Conjoin(".");
-
     /// <summary>Creates the source of the <see cref="INamedTypeSymbol"/>.</summary>
     /// <param name="symbol">The symbol to use.</param>
     /// <param name="compilation">The compilation that contains references to ValueTuple.</param>
