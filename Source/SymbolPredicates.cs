@@ -6,13 +6,15 @@ using static Accessibility;
 /// <summary>Contains various predicates for <see cref="ISymbol"/> and its derivatives.</summary>
 static class SymbolPredicates
 {
-    /// <summary>Determines whether the symbol has the attribute.</summary>
-    /// <param name="symbol">The symbol to check.</param>
+    /// <summary>Determines whether the symbol can be in an implicit operator.</summary>
+    /// <param name="method">The symbol to check.</param>
     /// <returns>
-    /// The value <see langword="true"/> if the parameter <paramref name="symbol"/> has the attribute.
+    /// The value <see langword="true"/> if the parameter <paramref name="method"/>
+    /// can be in an implicit operator, otherwise; <see langword="false"/>.
     /// </returns>
     [Pure]
-    public static bool HasDisablingAttribute(this ISymbol symbol) => symbol.HasAttribute("NoImplicitOperator");
+    public static bool CanBeInImplicitOperator(this IMethodSymbol method) =>
+        method.Parameters is [var y] ? y.Type.IsInterface() : method.Parameters.Any(x => !x.Type.CanBeGeneric());
 
     /// <summary>Determines whether the symbol has zero or one parameter of the specified parameter.</summary>
     /// <param name="single">The comparison when there is one parameter.</param>
@@ -50,8 +52,7 @@ static class SymbolPredicates
     [Pure]
     public static bool IsCandidate(this INamedTypeSymbol symbol) =>
         symbol is { IsAbstract: false, IsStatic: false } &&
-        symbol.IsCompletelyPartial() &&
-        !symbol.HasDisablingAttribute();
+        symbol.IsCompletelyPartial();
 
     /// <summary>Determines whether the right-hand side is relatively accessible to the left.</summary>
     /// <param name="left">The left-hand side.</param>

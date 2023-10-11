@@ -6,11 +6,11 @@ static class SymbolStringifiers
 {
     /// <summary>Creates the source of the <see cref="INamedTypeSymbol"/>.</summary>
     /// <param name="symbol">The symbol to use.</param>
-    /// <param name="compilation">The compilation that contains references to ValueTuple.</param>
+    /// <param name="hasValueTuple">Determines whether <see cref="ValueTuple"/> is defined.</param>
     /// <returns>The source of the parameter <paramref name="symbol"/>.</returns>
     [Pure]
-    public static string? Source(this INamedTypeSymbol? symbol, Compilation compilation) =>
-        Make(symbol, compilation) is { } initial
+    public static string? Source(this INamedTypeSymbol? symbol, bool hasValueTuple) =>
+        Make(symbol, hasValueTuple) is { } initial
             ? ((ISymbol?)symbol)
            .FindPathToNull(x => x.ContainingWithoutGlobal())
            .Aggregate(initial, Next)
@@ -18,10 +18,8 @@ static class SymbolStringifiers
             : null;
 
     [Pure]
-    static string? Make(INamedTypeSymbol? type, Compilation compilation)
+    static string? Make(INamedTypeSymbol? type, bool hasValueTuple)
     {
-        const int MaxTypeParametersInValueTuple = 8;
-
         bool HasOverloadWithSameImplicitSignature(IMethodSymbol method)
         {
             bool ParameterEqual(IMethodSymbol x) =>
@@ -30,19 +28,15 @@ static class SymbolStringifiers
             return method.Parameters is [_] && type.InstanceConstructors.Any(ParameterEqual);
         }
 
-        bool LacksRequiredValueTupleReference(IMethodSymbol method) =>
-            Math.Min(method.Parameters.Length, MaxTypeParametersInValueTuple) is not 1 and var length &&
-            compilation.GetTypeByMetadataName($"{nameof(System)}.{nameof(ValueTuple)}`{length}") is null;
-
         return type
           ?.InstanceConstructors
+           .Where(x => hasValueTuple || x.Parameters.Length is 1)
            .Where(type.IsRelativelyAccessible)
            .Omit(type.HasEmptyParametersOrSingleInterfaceOrSingleSelf)
            .Omit(type.HasSameParameters)
-           .Omit(SymbolPredicates.HasDisablingAttribute)
-           .Omit(x => x.Parameters.Debug() is [var y] ? y.Type.IsInterface() : x.Parameters.Any(x => !x.Type.CanBeGeneric()))
+           .Omit(x => x.HasAttributeWithFullyQualifiedMetadataName(Of<AttributeGenerator>()))
+           .Omit(SymbolPredicates.CanBeInImplicitOperator)
            .Omit(HasOverloadWithSameImplicitSignature)
-           .Omit(LacksRequiredValueTupleReference)
            .Select(x => MakeMethod(type, x))
            .ToCollectionLazily() is { Count: not 0 } collection
             ? CSharp($"{collection}")
@@ -66,7 +60,8 @@ static class SymbolStringifiers
              /// The new instance of {type,0:_} by passing the parameter <paramref name="{parameter}"/> to the constructor
              /// <see cref="{type,0}({types,0})"/>.
              /// </returns>
-             [Pure]
+             {Annotation}
+             [global::System.Diagnostics.Contracts.Pure]
              public static {(types.OfType<IPointerTypeSymbol>().Any() ? "unsafe " : "")}implicit operator {type}(
                 {method.Parameters:_}
              ) =>
