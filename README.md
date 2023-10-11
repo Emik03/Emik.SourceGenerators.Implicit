@@ -1,4 +1,4 @@
-# Emik.Analyzers.Matches
+# Emik.SourceGenerators.Implicit
 
 [![NuGet package](https://img.shields.io/nuget/v/Emik.SourceGenerators.Implicit.svg?logo=NuGet)](https://www.nuget.org/packages/Emik.SourceGenerators.Implicit)
 [![License](https://img.shields.io/github/license/Emik03/Emik.SourceGenerators.Implicit.svg?style=flat)](https://github.com/Emik03/Emik.SourceGenerators.Implicit/blob/main/LICENSE)
