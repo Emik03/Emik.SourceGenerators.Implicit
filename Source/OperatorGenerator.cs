@@ -36,8 +36,10 @@ public sealed class OperatorGenerator : IIncrementalGenerator
         return false;
     }
 
-    static INamedTypeSymbol? Target(SyntaxNode _, ISymbol symbol, SemanticModel model, CancellationToken __) =>
-        symbol is INamedTypeSymbol { IsTupleType: false } x && x.IsCandidate() ? x : null;
+    static INamedTypeSymbol? Target(SyntaxNode node, ISymbol symbol, SemanticModel model, CancellationToken token) =>
+        symbol is INamedTypeSymbol { IsTupleType: false } x && x.IsCandidate() && node.IsFirst(symbol, token)
+            ? x
+            : null;
 
     static (INamedTypeSymbol, string)? TryAddSource((INamedTypeSymbol Left, bool Right) tuple, CancellationToken _) =>
         tuple.Left.Source(tuple.Right) is { } source ? (tuple.Left, source) : null;
