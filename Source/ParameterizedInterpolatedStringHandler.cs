@@ -31,7 +31,7 @@ readonly ref struct ParameterizedInterpolatedStringHandler(int literalLength, in
         AppendLiteral(
             format is null ?
                 value is [var x] ? x.Name : value.Select(x => $"tuple.{x.Name}").Conjoin() :
-                value is [var y] ? Show(y) : $"({value.Select(x => Show(x)).Conjoin()}) tuple"
+                value is [var y] ? Show(y) : $"({value.Select(Show).Conjoin()}) tuple"
         );
 
     /// <summary>Writes the specified value to the handler.</summary>
