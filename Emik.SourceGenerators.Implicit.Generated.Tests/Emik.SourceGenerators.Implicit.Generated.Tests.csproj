@@ -5,7 +5,6 @@
     </PropertyGroup>
     <ItemGroup>
         <!--        <Compile Remove="$(Morsels)/Compile/**/*.cs"/>-->
-        <PackageReference Include="Emik.Unions" Version="2.1.1" PrivateAssets="all"/>
-        <PackageReference Include="Emik.Results" Version="2.1.1" PrivateAssets="all"/>
+        <PackageReference Include="Emik.Results" Version="4.0.0" PrivateAssets="all"/>
     </ItemGroup>
 </Project>

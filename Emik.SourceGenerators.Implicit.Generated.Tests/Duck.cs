@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MPL-2.0
-Cylinder a = (2, 4);
-Cylinder b = ("asf", "dfg");
-Cylinder c = "asf";
-Cylinder d = 123;
+Cylinder a = (2, 4); // Should not error.
+Cylinder b = ("asf", "dfg"); // Should not error.
+Cylinder c = "asf"; // Should error.
+Cylinder d = 123; // Should error.
 
 #pragma warning disable 0219, CA1819, IDE0059, MA0025, MA0110, RCS1085
 
@@ -20,5 +20,5 @@ partial class Cylinder(int i, int r)
     internal Cylinder(string i)
         : this(0, 0) { }
 
-    public static implicit operator Cylinder((string, string) i) => throw Todo;
+    public static implicit operator Cylinder((string, string) i) => throw Unreachable;
 }

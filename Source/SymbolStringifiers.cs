@@ -38,7 +38,7 @@ static class SymbolStringifiers
            .Omit(SymbolPredicates.CanBeInImplicitOperator)
            .Omit(HasOverloadWithSameImplicitSignature)
            .Select(x => MakeMethod(type, x))
-           .ToCollectionLazily() is { Count: not 0 } collection
+           .ToICollection() is { Count: not 0 } collection
             ? CSharp($"{collection}")
             : null;
     }
@@ -47,17 +47,19 @@ static class SymbolStringifiers
     static string MakeMethod(ISymbol type, IMethodSymbol method)
     {
         var parameter = method.Parameters is [{ Name: var single }] ? single : "tuple";
-        var types = method.Parameters.Select(x => x.Type).ToCollectionLazily();
+        var types = method.Parameters.Select(x => x.Type).ToICollection();
 
         return CSharp(
             $"""
              /// <summary>
-             /// Implicitly converts the parameter by creating the new instance of {type,0:_} by using the constructor
+             /// Implicitly converts the parameter by creating the new instance of
+             /// <see cref="{type,0:_}"/> by using the constructor
              /// <see cref="{type,0}({types,0})"/>.
              /// </summary>
              /// <param name="{parameter}">The parameter to pass onto the constructor.</param>
              /// <returns>
-             /// The new instance of {type,0:_} by passing the parameter <paramref name="{parameter}"/> to the constructor
+             /// The new instance of <see cref="{type,0:_}"/>
+             /// by passing the parameter <paramref name="{parameter}"/> to the constructor
              /// <see cref="{type,0}({types,0})"/>.
              /// </returns>
              {Annotation}

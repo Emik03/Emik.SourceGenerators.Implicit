@@ -30,8 +30,8 @@ readonly ref struct ParameterizedInterpolatedStringHandler(int literalLength, in
     public void AppendFormatted(IList<IParameterSymbol> value, string? format = null) =>
         AppendLiteral(
             format is null ?
-                value is [var x] ? x.Name : value.Select(x => $"tuple.{x.Name}").Conjoin() :
-                value is [var y] ? Show(y) : $"({value.Select(Show).Conjoin()}) tuple"
+                value is [var x] ? x.Name : value.Select(x => $"tuple.{ToPascalCase(x.Name)}").Conjoin() :
+                value is [var y] ? Show(y) : $"({value.Select(ShowPascal).Conjoin()}) tuple"
         );
 
     /// <summary>Writes the specified value to the handler.</summary>
@@ -54,6 +54,8 @@ readonly ref struct ParameterizedInterpolatedStringHandler(int literalLength, in
     /// <inheritdoc />
     public override string ToString() => $"{_builder}";
 
+    static string ToPascalCase(string str) => str is [var first, .. var rest] ? $"{first.ToUpper()}{rest}" : str;
+
     static string Show(IParameterSymbol x) => $"{Show(x.Type)} {x.Name}";
 
     static string Show(ISymbol value, bool keepBrackets = true, bool fullyQualified = true) =>
@@ -61,4 +63,6 @@ readonly ref struct ParameterizedInterpolatedStringHandler(int literalLength, in
         (fullyQualified ? FullyQualifiedFormat : MinimallyQualifiedFormat) is var format &&
         value.ToDisplayString(format) is var output &&
         keepBrackets ? output : output.Replace('<', '{').Replace('>', '}');
+
+    static string ShowPascal(IParameterSymbol x) => $"{Show(x.Type)} {ToPascalCase(x.Name)}";
 }
