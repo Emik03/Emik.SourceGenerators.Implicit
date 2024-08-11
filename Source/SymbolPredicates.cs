@@ -91,7 +91,7 @@ static class SymbolPredicates
     /// same parameter types, otherwise; <see langword="false"/>.
     /// </returns>
     public static bool ParameterTypeSequenceEqual(this IMethodSymbol left, IMethodSymbol right) =>
-        SequenceEqual(left, right.Destructure()) || SequenceEqual(left, right.ParameterTypes());
+        right.Destructure() is { } d && SequenceEqual(left, d) || SequenceEqual(left, right.ParameterTypes());
 
     static bool SequenceEqual(IMethodSymbol left, IEnumerable<ITypeSymbol> right) =>
         left.ParameterTypes().SequenceEqual(right, TypeSymbolComparer.Default);

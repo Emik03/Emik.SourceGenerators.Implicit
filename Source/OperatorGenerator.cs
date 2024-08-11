@@ -22,19 +22,8 @@ public sealed class OperatorGenerator : IIncrementalGenerator
         context.RegisterSourceOutput(provider, AddSource);
     }
 
-    static bool IsValueTupleDefined(Compilation compilation, CancellationToken token)
-    {
-        // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
-        foreach (var next in compilation.GetTypesByMetadataName($"{nameof(System)}.{nameof(ValueTuple)}"))
-        {
-            token.ThrowIfCancellationRequested();
-
-            if (next.IsAccessible() || next.ContainingAssembly.Identity == compilation.Assembly.Identity)
-                return true;
-        }
-
-        return false;
-    }
+    static bool IsValueTupleDefined(Compilation compilation, CancellationToken token) =>
+        compilation.GetTypesByMetadataName($"{nameof(System)}.{nameof(ValueTuple)}").Any();
 
     static INamedTypeSymbol? Target(SyntaxNode node, ISymbol symbol, SemanticModel model, CancellationToken token) =>
         symbol is INamedTypeSymbol { IsTupleType: false } x && x.IsCandidate() && node.IsFirst(symbol, token)
