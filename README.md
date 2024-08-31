@@ -1,7 +1,7 @@
 # Emik.SourceGenerators.Implicit
 
-[![NuGet package](https://img.shields.io/nuget/v/Emik.SourceGenerators.Implicit.svg?logo=NuGet)](https://www.nuget.org/packages/Emik.SourceGenerators.Implicit)
-[![License](https://img.shields.io/github/license/Emik03/Emik.SourceGenerators.Implicit.svg?style=flat)](https://github.com/Emik03/Emik.SourceGenerators.Implicit/blob/main/LICENSE)
+[![NuGet package](https://img.shields.io/nuget/v/Emik.SourceGenerators.Implicit.svg?color=50fa7b&logo=NuGet&style=for-the-badge)](https://www.nuget.org/packages/Emik.SourceGenerators.Implicit)
+[![License](https://img.shields.io/github/license/Emik03/Emik.SourceGenerators.Implicit.svg?color=6272a4&style=for-the-badge)](https://github.com/Emik03/Emik.SourceGenerators.Implicit/blob/main/LICENSE)
 
 Source-generates implicit conversion operators that map to the respective constructors.
 
