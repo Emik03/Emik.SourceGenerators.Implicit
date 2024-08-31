@@ -13,8 +13,10 @@ static class SymbolPredicates
     /// can be in an implicit operator, otherwise; <see langword="false"/>.
     /// </returns>
     [Pure]
-    public static bool CanBeInImplicitOperator(this IMethodSymbol method) =>
-        method.Parameters is [var y] ? y.Type.IsInterface() : method.Parameters.Any(x => !x.Type.CanBeGeneric());
+    public static bool CanNeverBeInImplicitOperator(this IMethodSymbol method) =>
+        method.Parameters is [var only]
+            ? only.RefKind is RefKind.Out || only.Type.IsInterface()
+            : method.Parameters.Any(x => x.RefKind is RefKind.None || !x.Type.CanBeGeneric());
 
     /// <summary>Determines whether the symbol has zero or one parameter of the specified parameter.</summary>
     /// <param name="single">The comparison when there is one parameter.</param>
@@ -25,8 +27,8 @@ static class SymbolPredicates
     /// </returns>
     [Pure]
     public static bool HasEmptyParametersOrSingleInterfaceOrSingleSelf(this ITypeSymbol single, IMethodSymbol method) =>
-        method.Parameters is [{ Type: var type }]
-            ? type.IsInterface() || TypeSymbolComparer.Equal(single, type)
+        method.Parameters is [{ Type: var only }]
+            ? only.IsInterface() || TypeSymbolComparer.Equal(single, only)
             : method.Parameters.IsEmpty;
 
     /// <summary>Determines whether the symbol has zero or one parameter of the specified parameter.</summary>

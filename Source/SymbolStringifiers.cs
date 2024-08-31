@@ -28,19 +28,18 @@ static class SymbolStringifiers
             return method.Parameters is [_] && type.InstanceConstructors.Any(ParameterEqual);
         }
 
-        return type
-          ?.InstanceConstructors
-           .Where(x => hasValueTuple || x.Parameters.Length is 1)
+        return type is not null &&
+            (hasValueTuple ? type.InstanceConstructors : type.InstanceConstructors.Where(x => x.Parameters.Length is 1))
            .Where(type.IsRelativelyAccessible)
+           .Omit(SymbolPredicates.CanNeverBeInImplicitOperator)
            .Omit(type.HasEmptyParametersOrSingleInterfaceOrSingleSelf)
            .Omit(type.HasSameParameters)
            .Omit(x => x.HasAttributeWithFullyQualifiedMetadataName(Of<AttributeGenerator>()))
-           .Omit(SymbolPredicates.CanBeInImplicitOperator)
            .Omit(HasOverloadWithSameImplicitSignature)
            .Select(x => MakeMethod(type, x))
            .ToICollection() is { Count: not 0 } collection
-            ? CSharp($"{collection}")
-            : null;
+                ? CSharp($"{collection}")
+                : null;
     }
 
     [Pure]
