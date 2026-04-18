@@ -20,5 +20,5 @@ partial class Cylinder(int i, int r)
     internal Cylinder(string i)
         : this(0, 0) { }
 
-    public static implicit operator Cylinder((string, string) i) => throw Unreachable;
+    public static implicit operator Cylinder((string, string) i) => throw new UnreachableException();
 }

@@ -11,10 +11,7 @@ static class SymbolStringifiers
     [Pure]
     public static string? Source(this INamedTypeSymbol? symbol, bool hasValueTuple) =>
         Make(symbol, hasValueTuple) is { } initial
-            ? ((ISymbol?)symbol)
-           .FindPathToNull(x => x.ContainingWithoutGlobal())
-           .Aggregate(initial, Next)
-           .Then(HeaderAndFooter)
+            ? HeaderAndFooter(symbol.FindPathToNull<ISymbol>(x => x.ContainingWithoutGlobal()).Aggregate(initial, Next))
             : null;
 
     [Pure]

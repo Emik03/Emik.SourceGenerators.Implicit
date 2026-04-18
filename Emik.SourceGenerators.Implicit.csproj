@@ -8,4 +8,7 @@
         <PackageTags>op_Implicit Implicit Conversion Operator Source Generator Analyzer Roslyn</PackageTags>
         <Description>Source-generates implicit conversion operators that map to the respective constructors.</Description>
     </PropertyGroup>
+    <ItemGroup>
+        <Compile Include="$(Morsels)/Compile/**/*.cs"/>
+    </ItemGroup>
 </Project>
